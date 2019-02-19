@@ -996,7 +996,7 @@ ngx_http_auth_spnego_handler(
     spnego_log0("Begin auth");
     if (alcf->allow_basic) {
         spnego_debug0("Detect basic auth");
-        spnego_log0("Basic allowed inconfig. Detect basic auth");
+        spnego_log0("Basic allowed in config. Detect basic auth");
         ret = ngx_http_auth_basic_user(r);
         if (NGX_OK == ret) {
             spnego_debug0("Basic auth credentials supplied by client");
@@ -1028,9 +1028,11 @@ ngx_http_auth_spnego_handler(
     ret = ngx_http_auth_spnego_token(r, ctx);
     if (NGX_OK == ret) {
         spnego_debug0("Client sent a reasonable Negotiate header");
+        spnego_log0("Client sent a reasonable Negotiate header");
         ret = ngx_http_auth_spnego_auth_user_gss(r, ctx, alcf);
         if (NGX_ERROR == ret) {
             spnego_debug0("GSSAPI failed");
+            spnego_log0("GSSAPI failed. Return 500");
             return (ctx->ret = NGX_HTTP_INTERNAL_SERVER_ERROR);
         }
         /* There are chances that client knows about Negotiate
@@ -1038,15 +1040,18 @@ ngx_http_auth_spnego_handler(
          * back to basic here... */
         if (NGX_DECLINED == ret) {
             spnego_debug0("GSSAPI failed");
+            spnego_log0("GSSAPI failed. Return 403");
             return (ctx->ret = NGX_HTTP_FORBIDDEN);
         }
 
         if (!ngx_spnego_authorized_principal(r, &r->headers_in.user, alcf)) {
             spnego_debug0("User not authorized");
+            spnego_log0("User not authorized. Return 403");
             return (ctx->ret = NGX_HTTP_FORBIDDEN);
         }
 
         spnego_debug0("GSSAPI auth succeeded");
+        spnego_log0("GSSAPI auth succeeded. Return 200");
     }
 
     ngx_str_t *token_out_b64 = NULL;
@@ -1066,6 +1071,7 @@ ngx_http_auth_spnego_handler(
 
     if (NGX_ERROR == ngx_http_auth_spnego_headers(r, ctx, token_out_b64, alcf)) {
         spnego_debug0("Error setting headers");
+        spnego_log0("Error setting headers. Return 500");
         ctx->ret = NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
