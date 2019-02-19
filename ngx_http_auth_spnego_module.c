@@ -53,6 +53,14 @@
         NGX_LOG_DEBUG_HTTP, r->connection->log, 0, msg, one, two, three)
 #define spnego_log_error(fmt, args...) ngx_log_error(\
         NGX_LOG_ERR, r->connection->log, 0, fmt, ##args)
+#define spnego_log0(msg) ngx_log_error(\
+        NGX_LOG_INFO, r->connection->log, 0, msg)
+#define spnego_log1(msg) ngx_log_error(\
+        NGX_LOG_INFO, r->connection->log, 0, msg, one)
+#define spnego_log2(msg) ngx_log_error(\
+        NGX_LOG_INFO, r->connection->log, 0, msg, one, two)
+#define spnego_log3(msg) ngx_log_error(\
+        NGX_LOG_INFO, r->connection->log, 0, msg, one, two, three)
 
 /* Module handler */
 static ngx_int_t ngx_http_auth_spnego_handler(ngx_http_request_t *);
@@ -117,7 +125,7 @@ typedef struct {
 } ngx_http_auth_spnego_loc_conf_t;
 
 #define SPNEGO_NGX_CONF_FLAGS NGX_HTTP_MAIN_CONF\
-    | NGX_HTTP_SRV_CONF\
+| NGX_HTTP_SRV_CONF\
 | NGX_HTTP_LOC_CONF\
 | NGX_HTTP_LMT_CONF\
 | NGX_CONF_FLAG
@@ -985,32 +993,38 @@ ngx_http_auth_spnego_handler(
     }
 
     spnego_debug0("Begin auth");
-
+    spnego_log0("Begin auth");
     if (alcf->allow_basic) {
         spnego_debug0("Detect basic auth");
+        spnego_log0("Basic allowed inconfig. Detect basic auth");
         ret = ngx_http_auth_basic_user(r);
         if (NGX_OK == ret) {
             spnego_debug0("Basic auth credentials supplied by client");
+            spnego_log0("Basic auth credentials supplied by client");
             /* If basic auth is enabled and basic creds are supplied
              * attempt basic auth.  If we attempt basic auth, we do
              * not fall through to real SPNEGO */
             if (NGX_DECLINED == ngx_http_auth_spnego_basic(r, ctx, alcf)) {
                 spnego_debug0("Basic auth failed");
+                spnego_log0("Basic auth failed. Returning 401");
                 return (ctx->ret = NGX_HTTP_UNAUTHORIZED);
             }
 
             if (!ngx_spnego_authorized_principal(r, &r->headers_in.user, alcf)) {
                 spnego_debug0("User not authorized");
+                spnego_log0("User not authorized. Returning 403");
                 return (ctx->ret = NGX_HTTP_FORBIDDEN);
             }
 
             spnego_debug0("Basic auth succeeded");
+            spnego_log0("Basic auth succeeded. Returning 200");
             return (ctx->ret = NGX_OK);
         }
     }
 
     /* Basic auth either disabled or not supplied by client */
     spnego_debug0("Detect SPNEGO token");
+    spnego_log0("Basic disabled. Detect SPNEGO token")
     ret = ngx_http_auth_spnego_token(r, ctx);
     if (NGX_OK == ret) {
         spnego_debug0("Client sent a reasonable Negotiate header");
