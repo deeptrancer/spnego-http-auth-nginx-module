@@ -1024,7 +1024,7 @@ ngx_http_auth_spnego_handler(
 
     /* Basic auth either disabled or not supplied by client */
     spnego_debug0("Detect SPNEGO token");
-    spnego_log0("Basic disabled. Detect SPNEGO token")
+    spnego_log0("Basic disabled. Detect SPNEGO token");
     ret = ngx_http_auth_spnego_token(r, ctx);
     if (NGX_OK == ret) {
         spnego_debug0("Client sent a reasonable Negotiate header");
