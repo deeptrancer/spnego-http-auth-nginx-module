@@ -53,13 +53,13 @@
         NGX_LOG_DEBUG_HTTP, r->connection->log, 0, msg, one, two, three)
 #define spnego_log_error(fmt, args...) ngx_log_error(\
         NGX_LOG_ERR, r->connection->log, 0, fmt, ##args)
-#define spnego_log0(msg) ngx_log_error(\
+#define spnego_log0(msg) ngx_log_error0(\
         NGX_LOG_INFO, r->connection->log, 0, msg)
-#define spnego_log1(msg) ngx_log_error(\
+#define spnego_log1(msg) ngx_log_error1(\
         NGX_LOG_INFO, r->connection->log, 0, msg, one)
-#define spnego_log2(msg) ngx_log_error(\
+#define spnego_log2(msg) ngx_log_error2(\
         NGX_LOG_INFO, r->connection->log, 0, msg, one, two)
-#define spnego_log3(msg) ngx_log_error(\
+#define spnego_log3(msg) ngx_log_error3(\
         NGX_LOG_INFO, r->connection->log, 0, msg, one, two, three)
 
 /* Module handler */
